@@ -44,6 +44,7 @@ jobs:
             PRE_RELEASE=''
           elif [[ "${{ inputs.version_bump }}" == "pre-release" ]]; then
             PRE_RELEASE=${PRE_RELEASE:0:2}$(( ${PRE_RELEASE:2} + 1 ))
+          fi
           
           sed -i 's/^MAJOR\s*=\s*[0-9]\+/MAJOR = '$MAJOR'/' $VERSION_FILE
           sed -i 's/^MINOR\s*=\s*[0-9]\+/MINOR = '$MINOR'/' $VERSION_FILE
