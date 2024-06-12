@@ -21,7 +21,7 @@ jobs:
         id: extract-changelog
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: 1
+          issue-number: ${{ github.event.number }}
           body-includes: |
             Changelog:
             -----------
@@ -30,7 +30,7 @@ jobs:
         id: extract-summary
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: 1
+          issue-number: ${{ github.event.number }}
           body-includes: |
             Summary:
             -----------
