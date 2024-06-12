@@ -61,6 +61,7 @@ jobs:
       - name: Get most recent tag
         id: recent-tag
         run: |
+          cd ${{ github.run_id }}
           TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)")
           echo "TAG=$TAG" >> "$GITHUB_OUTPUT"
 
