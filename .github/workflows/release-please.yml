@@ -35,16 +35,16 @@ jobs:
             MAJOR=$(( $MAJOR + 1 ))
             MINOR=0
             PATCH=0
-            PRE_RELEASE=''
+            PRE_RELEASE="''"
           elif [[ "${{ inputs.version_bump }}" == "minor" ]]; then
             MINOR=$(( $MINOR + 1 ))
             PATCH=0
-            PRE_RELEASE=''
+            PRE_RELEASE="''"
           elif [[ "${{ inputs.version_bump }}" == "minor" ]]; then
             PATCH=$(( $PATCH + 1 ))
             PRE_RELEASE="''"
           elif [[ "${{ inputs.version_bump }}" == "pre-release" ]]; then
-            PRE_RELEASE="'"${PRE_RELEASE:0:2}$(( ${PRE_RELEASE:2} + 1 ))"'"$
+            PRE_RELEASE="'"${PRE_RELEASE:0:2}$(( ${PRE_RELEASE:2} + 1 ))"'"
           fi
 
           sed -i 's/^MAJOR\s*=\s*[0-9]\+/MAJOR = '$MAJOR'/' $VERSION_FILE
