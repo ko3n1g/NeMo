@@ -41,21 +41,15 @@ jobs:
           CHANGELOG=$(echo "${{ steps.extract-changelog.outputs.comment-body }}" | sed '/Changelog:/d' | sed '/^-----------$/d')
           SUMMARY=$(echo "${{ steps.extract-summary.outputs.comment-body }}" | sed '/Summary:/d' | sed '/^-----------$/d') 
           
-          TITLE="NVIDIA Neural Modules ${{ steps.version-number.outputs.VERSION }}"
-          read -r -d '' BODY <<- EOM
-          # Highlights
-          $SUMMARY
-
-          # Detailed Changelogs
-          $CHANGELOG
-          EOM
-
           echo "TITLE<<EOF" >> $GITHUB_ENV
-          echo "$TITLE" >> $GITHUB_ENV
+          echo "NVIDIA Neural Modules ${{ steps.version-number.outputs.VERSION }}" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
           echo "BODY<<EOF" >> $GITHUB_ENV
-          echo "$BODY" >> $GITHUB_ENV
+          echo "# Highlights" >> $GITHUB_ENV
+          echo "$SUMMARY" >> $GITHUB_ENV
+          echo "# Detailed Changelogs" >> $GITHUB_ENV
+          echo "$CHANGELOG" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create Release
