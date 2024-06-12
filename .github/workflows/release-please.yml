@@ -100,8 +100,8 @@ jobs:
             🚀 PR to release NeMo `${{ steps.bump-version.outputs.VERSION }}`.
 
             📝 Please remember the following to-do's before merge:
-            - [ ] Review the comment `Changelog`
-            - [ ] Fill-in the comment `Summary`
+            - [ ] Fill-in the comment `Highlights`
+            - [ ] Review the comment `Detailed Changelogs`
 
             🚨 Please also keep in mind to _not_ delete the headings of the task commits. They are required by the post-merge automation.
 
@@ -112,20 +112,19 @@ jobs:
           # assignees: ericharper
           labels: 'Run CICD'
 
-      - name: Add Changelog comment
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          issue-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
-          body: |
-            Changelog:
-            -----------
-            ${{ steps.build-changelog.outputs.changelog }}
-            
       - name: Add Summary comment
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
           body: |
-            Summary:
-            -----------
+            # Highlights
             _<here-goes-the-summary...>_
+
+      - name: Add Changelog comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+          body: |
+            # Detailed Changelogs
+            ${{ steps.build-changelog.outputs.changelog }}
+            

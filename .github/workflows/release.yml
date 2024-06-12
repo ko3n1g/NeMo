@@ -22,34 +22,26 @@ jobs:
         uses: peter-evans/find-comment@v3
         with:
           issue-number: ${{ github.event.number }}
-          body-includes: |
-            Changelog:
-            -----------
+          body-includes: '# Detailed Changelogs'
       
       - name: Extract summary
         id: extract-summary
         uses: peter-evans/find-comment@v3
         with:
           issue-number: ${{ github.event.number }}
-          body-includes: |
-            Summary:
-            -----------
+          body-includes: '# Highlights'
         
       - name: Create Release doc
         id: create-release-doc
         run: |
-          CHANGELOG=$(echo "${{ steps.extract-changelog.outputs.comment-body }}" | sed '/Changelog:/d' | sed '/^-----------$/d')
-          SUMMARY=$(echo "${{ steps.extract-summary.outputs.comment-body }}" | sed '/Summary:/d' | sed '/^-----------$/d') 
           
           echo "TITLE<<EOF" >> $GITHUB_ENV
           echo "NVIDIA Neural Modules ${{ steps.version-number.outputs.VERSION }}" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
           echo "BODY<<EOF" >> $GITHUB_ENV
-          echo "# Highlights" >> $GITHUB_ENV
-          echo "$SUMMARY" >> $GITHUB_ENV
-          echo "# Detailed Changelogs" >> $GITHUB_ENV
-          echo "$CHANGELOG" >> $GITHUB_ENV
+          echo "${{ steps.extract-summary.outputs.comment-body }}" >> $GITHUB_ENV
+          echo "${{ steps.extract-changelog.outputs.comment-body }}" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create Release
