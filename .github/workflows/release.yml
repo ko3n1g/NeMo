@@ -1,0 +1,15 @@
+name: "Release"
+
+on:
+  pull_request:
+    types: [closed]
+    branches: 
+      - rmain
+
+jobs: 
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo ${{ github.event.pull_request.head.ref }}
+          echo ${{ startsWith(github.event.pull_request.head.ref, 'release/') }}
