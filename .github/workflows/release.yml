@@ -11,10 +11,16 @@ jobs:
     if: startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.run_id }}
+
       - name: Get version number
         id: version-number
         run: |
-          VERSION=$(echo ${{ github.event.pull_request.head.ref }} | sed 's/^release\///')
+          cd ${{ github.run_id }}
+          VERSION=$(python -c "import nemo; print(nemo.__version__)")
           echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Extract changelog
@@ -50,4 +56,24 @@ jobs:
           name: ${{ env.TITLE }}
           tag_name: ${{ steps.version-number.outputs.VERSION }}
           body: ${{ env.BODY }}
+      
+      - name: Build, test, and release wheel
+        run: |
+          cd ${{ github.run_id }}
+          python3 -m pip install --upgrade build
+          python3 -m build --wheel
+
+          pip install dist/*.whl
+
+          cd ../
+
+          INSTALLED_VERSION=$(python -c 'import nemo; print(nemo.__version__)')
+          EXPECTED_VERSION=${{ steps.version-number.outputs.VERSION }}
+          
+          if [[ "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]]; then
+            echo 'Wheel has an outdated version, mission abort immediately!'
+            exit 1
+          fi
+
+          echo Proceed with uploading wheel...
           
