@@ -95,9 +95,9 @@ jobs:
         with:
           path: ${{ github.run_id }}
           branch: release/${{ steps.bump-version.outputs.VERSION }}
-          title: 'Release ${{ steps.bump-version.outputs.VERSION }}'
+          title: 'Release `${{ steps.bump-version.outputs.VERSION }}`'
           body: |
-            🚀 PR to release NeMo ${{ steps.bump-version.outputs.VERSION }}.
+            🚀 PR to release NeMo `${{ steps.bump-version.outputs.VERSION }}`.
 
             💡 Please remember the following to-do's before merge:
             - [ ] Review the comment `Changelog`
