@@ -97,13 +97,16 @@ jobs:
           branch: release/${{ steps.bump-version.outputs.VERSION }}
           title: 'Release ${{ steps.bump-version.outputs.VERSION }}'
           body: |
-            PR to release NeMo ${{ steps.bump-version.outputs.VERSION }}.
+            🚀 PR to release NeMo ${{ steps.bump-version.outputs.VERSION }}.
 
-            Please remember the following to-do's before merge:
+            💡 Please remember the following to-do's before merge:
             - [ ] Review the comment `Changelog`
             - [ ] Fill-in the comment `Summary`
 
-          commit-message: "[bot 🤠] Howdy folks, let's release!"
+            ❗ Please also keep in mind to _not_ delete the headings of the
+            task commits. They are required by the post-merge automation.
+
+          commit-message: "[🤠]: Howdy folks, let's release NeMo `${{ steps.bump-version.outputs.VERSION }}` !"
           signoff: true
           # assignees: ericharper
 
