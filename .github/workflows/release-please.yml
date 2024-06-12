@@ -54,7 +54,7 @@ jobs:
           sed -i 's/^PRE_RELEASE\s*=\s*'.*'/PRE_RELEASE = '$PRE_RELEASE'/' $VERSION_FILE
 
           cat $VERSION_FILE
-
+          PRE_RELEASE=$(echo $PRE_RELEASE | tr -d "'")
           echo "VERSION=$MAJOR.$MINOR.$PATCH$PRE_RELEASE" >> "$GITHUB_OUTPUT"
     
       - name: Create Release PR
