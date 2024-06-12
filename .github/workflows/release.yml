@@ -35,12 +35,33 @@ jobs:
             Summary:
             -----------
         
-      - name: Create tag 
-        id: create-tag
+      - name: Create Release doc
+        id: create-release-doc
         run: |
-          echo "${{ steps.extract-changelog.outputs.comment-body }}" | sed '/Changelog:/d' | sed '/^-----------$/d' 
-          echo "${{ steps.extract-summary.outputs.comment-body }}" | sed '/Summary:/d' | sed '/^-----------$/d' 
+          CHANGELOG=$(echo "${{ steps.extract-changelog.outputs.comment-body }}" | sed '/Changelog:/d' | sed '/^-----------$/d')
+          SUMMARY=$(echo "${{ steps.extract-summary.outputs.comment-body }}" | sed '/Summary:/d' | sed '/^-----------$/d') 
+          
+          TITLE="NVIDIA Neural Modules ${{ steps.version-number.outputs.VERSION }}"
+          read -r -d '' BODY <<- EOM
+          # Highlights
+          $SUMMARY
 
-      # - name: Create release
-      #   id: create-release
+          # Detailed Changelogs
+          $CHANGELOG
+          EOM
 
+          echo "TITLE<<EOF" >> $GITHUB_ENV
+          echo "$TITLE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "BODY<<EOF" >> $GITHUB_ENV
+          echo "$BODY" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.TITLE }}
+          tag_name: ${{ steps.version-number.outputs.VERSION }}
+          body: ${{ env.BODY }}
+          
