@@ -8,8 +8,39 @@ on:
 
 jobs: 
   main:
+    if: startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo ${{ github.event.pull_request.head.ref }}
-          echo ${{ startsWith(github.event.pull_request.head.ref, 'release/') }}
+      - name: Get version number
+        id: version-number
+        run: |
+          VERSION=$(echo ${{ github.event.pull_request.head.ref }} | sed 's/^release\///')
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog
+        id: extract-changelog
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: 1
+          body-includes: |
+            Changelog:
+            -----------
+      
+      - name: Extract summary
+        id: extract-summary
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: 1
+          body-includes: |
+            Summary:
+            -----------
+        
+      - name: Create tag 
+        id: create-tag
+        run: |
+          echo "${{ steps.extract-changelog.outputs.comment-body }}" | sed '/Changelog:/d' | sed '/^-----------$/d' 
+          echo "${{ steps.extract-summary.outputs.comment-body }}" | sed '/Summary:/d' | sed '/^-----------$/d' 
+
+      # - name: Create release
+      #   id: create-release
+
