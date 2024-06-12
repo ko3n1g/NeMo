@@ -28,7 +28,7 @@ jobs:
           MAJOR=$(sed -n 's/^MAJOR\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE)
           MINOR=$(sed -n 's/^MINOR\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE)
           PATCH=$(sed -n 's/^PATCH\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE)
-          PRE_RELEASE=$(sed -n 's/^PRE_RELEASE\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE) 
+          PRE_RELEASE=$(sed -n "s/^PRE_RELEASE\s*=\s*'\([^']\+\)'/\1/p" $VERSION_FILE) 
 
           if [[ "${{ inputs.version_bump }}" == "major" ]]; then
             MAJOR=$(( $MAJOR + 1 ))
@@ -45,10 +45,10 @@ jobs:
           elif [[ "${{ inputs.version_bump }}" == "pre-release" ]]; then
             PRE_RELEASE=${PRE_RELEASE:0:2}$(( ${PRE_RELEASE:2} + 1 ))
           fi
-          
+
           sed -i 's/^MAJOR\s*=\s*[0-9]\+/MAJOR = '$MAJOR'/' $VERSION_FILE
           sed -i 's/^MINOR\s*=\s*[0-9]\+/MINOR = '$MINOR'/' $VERSION_FILE
           sed -i 's/^PATCH\s*=\s*[0-9]\+/PATCH = '$PATCH'/' $VERSION_FILE
-          sed -i 's/^PRE_RELEASE\s*=\s*[0-9]\+/PRE_RELEASE = '$PRE'/' $VERSION_FILE
+          sed -i 's/^PRE_RELEASE\s*=\s*'.*'/PRE_RELEASE = '$PRE_RELEASE'/' $VERSION_FILE
 
           cat $VERSION_FILE
