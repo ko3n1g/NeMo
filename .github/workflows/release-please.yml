@@ -22,7 +22,8 @@ jobs:
         with:
           path: ${{ github.run_id }}
           
-      - env:
+      - name: Bump version
+        env:
           VERSION_FILE: ${{ github.run_id }}/nemo/package_info.py
         run: |
           MAJOR=$(sed -n 's/^MAJOR\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE)
@@ -41,7 +42,7 @@ jobs:
             PRE_RELEASE=''
           elif [[ "${{ inputs.version_bump }}" == "minor" ]]; then
             PATCH=$(( $PATCH + 1 ))
-            PRE_RELEASE=''
+            PRE_RELEASE="''"
           elif [[ "${{ inputs.version_bump }}" == "pre-release" ]]; then
             PRE_RELEASE=${PRE_RELEASE:0:2}$(( ${PRE_RELEASE:2} + 1 ))
           fi
