@@ -22,6 +22,7 @@ jobs:
         with:
           path: ${{ github.run_id }}
           fetch-depth: 0
+          fetch-tags: true
           
       - name: Bump version
         id: bump-version
