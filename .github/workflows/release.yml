@@ -1,0 +1,53 @@
+name: "Release"
+
+on:
+  pull_request:
+    types: [closed]
+    branches: 
+      - main
+
+jobs: 
+  main:
+    if: startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version number
+        id: version-number
+        run: |
+          VERSION=$(echo ${{ github.event.pull_request.head.ref }} | sed 's/^release\///')
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog
+        id: extract-changelog
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.number }}
+          body-includes: '# Detailed Changelogs'
+      
+      - name: Extract summary
+        id: extract-summary
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.number }}
+          body-includes: '# Highlights'
+        
+      - name: Create Release doc
+        id: create-release-doc
+        run: |
+          
+          echo "TITLE<<EOF" >> $GITHUB_ENV
+          echo "NVIDIA Neural Modules ${{ steps.version-number.outputs.VERSION }}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "BODY<<EOF" >> $GITHUB_ENV
+          echo "${{ steps.extract-summary.outputs.comment-body }}" >> $GITHUB_ENV
+          echo "${{ steps.extract-changelog.outputs.comment-body }}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.TITLE }}
+          tag_name: ${{ steps.version-number.outputs.VERSION }}
+          body: ${{ env.BODY }}
+          
