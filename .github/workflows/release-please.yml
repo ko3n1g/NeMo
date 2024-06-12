@@ -1,0 +1,52 @@
+name: "Prepare release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Type of version bump'
+        required: true
+        options:
+          - major
+          - minor
+          - patch
+          - pre-release
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.run_id }}
+          
+      - env:
+          VERSION_FILE: ${{ github.run_id }}/nemo/package_info.py
+        run: |
+          MAJOR=$(sed -n 's/^MAJOR\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE)
+          MINOR=$(sed -n 's/^MINOR\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE)
+          PATCH=$(sed -n 's/^PATCH\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE)
+          PRE_RELEASE=$(sed -n 's/^PRE_RELEASE\s*=\s*\([0-9]\+\)/\1/p' $VERSION_FILE) 
+
+          if [[ "${{ inputs.version_bump }}" == "major" ]]; then
+            MAJOR=$(( $MAJOR + 1 ))
+            MINOR=0
+            PATCH=0
+            PRE_RELEASE=''
+          elif [[ "${{ inputs.version_bump }}" == "minor" ]]; then
+            MINOR=$(( $MINOR + 1 ))
+            PATCH=0
+            PRE_RELEASE=''
+          elif [[ "${{ inputs.version_bump }}" == "minor" ]]; then
+            PATCH=$(( $PATCH + 1 ))
+            PRE_RELEASE=''
+          elif [[ "${{ inputs.version_bump }}" == "pre-release" ]]; then
+            PRE_RELEASE=${PRE_RELEASE:0:2}$(( ${PRE_RELEASE:2} + 1 ))
+          
+          sed -i 's/^MAJOR\s*=\s*[0-9]\+/MAJOR = '$MAJOR'/' $VERSION_FILE
+          sed -i 's/^MINOR\s*=\s*[0-9]\+/MINOR = '$MINOR'/' $VERSION_FILE
+          sed -i 's/^PATCH\s*=\s*[0-9]\+/PATCH = '$PATCH'/' $VERSION_FILE
+          sed -i 's/^PRE_RELEASE\s*=\s*[0-9]\+/PRE_RELEASE = '$PRE'/' $VERSION_FILE
+
+          cat $VERSION_FILE
