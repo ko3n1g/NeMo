@@ -23,6 +23,7 @@ jobs:
           path: ${{ github.run_id }}
           
       - name: Bump version
+        id: bump-version
         env:
           VERSION_FILE: ${{ github.run_id }}/nemo/package_info.py
         run: |
@@ -53,3 +54,14 @@ jobs:
           sed -i 's/^PRE_RELEASE\s*=\s*'.*'/PRE_RELEASE = '$PRE_RELEASE'/' $VERSION_FILE
 
           cat $VERSION_FILE
+
+          echo "VERSION=$MAJOR.$MINOR.$PATCH$PRE_RELEASE" >> "$GITHUB_OUTPUT"
+    
+      - name: Create Release PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          path: ${{ github.run_id }}
+          branch: release/${{ steps.bump-version.outputs.VERSION }}
+          commit-message: "[bot 🤠] Howdy folks, let's release!"
+          signoff: true
+          # assignees: ericharper
