@@ -56,13 +56,69 @@ jobs:
           cat $VERSION_FILE
           PRE_RELEASE=$(echo $PRE_RELEASE | tr -d "'")
           echo "VERSION=$MAJOR.$MINOR.$PATCH$PRE_RELEASE" >> "$GITHUB_OUTPUT"
-    
+
+      - name: Get most recent tag
+        id: recent-tag
+        run: |
+          cd ${{ github.run_id }}/
+          TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+          echo "TAG=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Build Changelog
+        id: build-changelog
+        uses: mikepenz/release-changelog-builder-action@v3.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Configuration file is setup with filters for domains
+          # owner:repo must point to current repo
+          # fromTag: Auto resolved from historical tag order (previous tag compared to current tag)
+          # toTag: Current tag reference
+          configuration: ".github/workflows/config/changelog-config.json"
+          owner: "ko3n1g"
+          repo: "NeMo"
+          ignorePreReleases: "false"
+          failOnError: "false"
+          fromTag: ${{ steps.recent-tag.outputs.TAG }}
+          toTag: ${{ github.sha }}
+
+      - name: Append Changelog
+        run: |
+          echo "${{ steps.build-changelog.outputs.changelog }}"
+
+
       - name: Create Release PR
         uses: peter-evans/create-pull-request@v6
+        id: create-pull-request
         with:
           path: ${{ github.run_id }}
           branch: release/${{ steps.bump-version.outputs.VERSION }}
           title: 'Release ${{ steps.bump-version.outputs.VERSION }}'
+          body: |
+            PR to release NeMo ${{ steps.bump-version.outputs.VERSION }}.
+
+            Please remember the following to-do's before merge:
+            - [ ] Review the comment `Changelog`
+            - [ ] Fill-in the comment `Summary`
+
           commit-message: "[bot 🤠] Howdy folks, let's release!"
           signoff: true
           # assignees: ericharper
+
+      - name: Add Changelog comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+          body: |
+            Changelog:
+            -----------
+            ${{ steps.build-changelog.outputs.changelog }}
+            
+      - name: Add Summary comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
+          body: |
+            Summary:
+            -----------
+            <here-goes-the-summary...>
