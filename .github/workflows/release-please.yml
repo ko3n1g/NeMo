@@ -62,6 +62,7 @@ jobs:
         with:
           path: ${{ github.run_id }}
           branch: release/${{ steps.bump-version.outputs.VERSION }}
+          title: 'Release ${{ steps.bump-version.outputs.VERSION }}'
           commit-message: "[bot 🤠] Howdy folks, let's release!"
           signoff: true
           # assignees: ericharper
