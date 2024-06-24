@@ -1,20 +1,48 @@
 name: "Release"
 
 on:
-  pull_request:
-    types: [closed]
-    branches: 
-      - main
+  issue_comment:
+    types: [created]
 
 jobs: 
   main:
-    if: startsWith(github.event.pull_request.head.ref, 'release/') # && github.event.pull_request.merged == true
+    if: >
+      github.event_name == 'issue_comment' &&
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/release-please') &&
+      contains(fromJSON('["ko3n1g"]'), github.actor) 
     runs-on: ubuntu-latest
     steps:
+      - name: Get PR number
+        shell: bash -x -e {0}
+        id: get-pr-num
+        run: |
+          PR_URL="${{ github.event.issue.pull_request.url }}"
+          PR_NUM=${PR_URL##*/}
+          echo "pr_number=$PR_NUM" >> $GITHUB_OUTPUT
+
+      - name: Get Pull Request Information
+        uses: actions/github-script@v6
+        id: get-pr-branch
+        with:
+          result-encoding: string
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: ${{ steps.get-pr-num.outputs.pr_number }}
+            });
+            console.log('Pull Request Information:', pr.data);
+            core.setOutput('REF', pr.data.head.ref)
+            core.setOutput('NUMBER', pr.data.number)
+
+            return pr.data.head.ref;
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           path: ${{ github.run_id }}
+          ref: ${{ steps.get-pr-branch.outputs.REF }}
 
       - name: Get version number
         id: version-number
@@ -27,14 +55,14 @@ jobs:
         id: extract-changelog
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: ${{ github.event.number }}
+          issue-number: ${{ steps.get-pr-branch.outputs.NUMBER }}
           body-includes: '# Detailed Changelogs'
       
       - name: Extract summary
         id: extract-summary
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: ${{ github.event.number }}
+          issue-number: ${{ steps.get-pr-branch.outputs.NUMBER }}
           body-includes: '# Highlights'
         
       - name: Create Release doc
