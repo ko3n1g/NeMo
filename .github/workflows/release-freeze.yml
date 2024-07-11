@@ -134,5 +134,8 @@ jobs:
 
       - name: Push version bump
         run: |
+          cd ${{ github.run_id }}
+          git config --global user.name "NeMo Toolkit Bot"
+          git config --global user.email nemo@github.com
           git commit -m "Version bump NeMo Toolkit"
           git push
