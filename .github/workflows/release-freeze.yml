@@ -36,6 +36,9 @@ jobs:
           VERSION=$(python -c 'import nemo; print(nemo.__version__)')
           
           git checkout -b "r$VERSION"
+          echo "Dummy file to keep PR open" > dummy
+          git add dummy
+          git commit -m "Create release branch"
           git push -u origin "r$VERSION"
 
           echo "ref=r$VERSION" >> "$GITHUB_OUTPUT"
