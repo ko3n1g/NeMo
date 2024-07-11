@@ -105,7 +105,7 @@ jobs:
     environment: 
       name: main
     env:
-      VERSION_FILE: ${{ github.run_id }}/nemo/package_info.py
+      VERSION_FILE: nemo/package_info.py
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -119,6 +119,7 @@ jobs:
       - name: Bump version
         id: bump-version
         run: |
+          cd ${{ github.run_id }}
           FULL_VERSION_NUM=${{ inputs.next_version }}
           VERSION=${FULL_VERSION_NUM%%rc*}
           MAJOR=$(echo "$version" | cut -d. -f1)
@@ -137,6 +138,7 @@ jobs:
 
       - name: Push version bump
         run: |
+          cd ${{ github.run_id }}
           git add $VERSION_FILE
           git config --global user.name "NeMo Toolkit Bot"
           git config --global user.email nemo@github.com
