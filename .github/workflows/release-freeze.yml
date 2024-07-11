@@ -18,6 +18,15 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           ref: main
+      
+      - name: Get Previous tag
+        id: previous-tag
+        # git for-each-ref --sort=-creatordate --format '%(refname)' refs/tags ==> refs/tags/vX.Y.Z in descending order of date
+        # awk 'FNR == 2 {print substr($1, 11, length($1))}') ==> Selects the 2nd tag from the list, then strips the /refs/tags/ part of the tag
+        # set-output name=tag_name:: ==> Takes the clean tag vX.Y.Z and sets it to steps.previous_tag.outputs.tag_name
+        run: |
+          TAG=$(git for-each-ref --sort=-creatordate --format '%(refname)' refs/tags | awk 'FNR == 2 {print substr($1, 11, length($1))}')
+          echo "tag-name=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Create release branch
         id: release-branch
@@ -46,7 +55,7 @@ jobs:
           repo: ${{ github.event.repository.name }} 
           ignorePreReleases: "false"
           failOnError: "false"
-          fromTag: main
+          fromTag: ${{ steps.previous-tag.outputs.tag-name }}
           toTag: ${{ steps.release-branch.outputs.ref }}
 
       - name: Append Changelog
