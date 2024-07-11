@@ -54,14 +54,14 @@ jobs:
         id: extract-changelog
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: ${{ github.event.number }}
+          issue-number: ${{ steps.get-pr-num.outputs.pr_number }}
           body-includes: '# Detailed Changelogs'
       
       - name: Extract summary
         id: extract-summary
         uses: peter-evans/find-comment@v3
         with:
-          issue-number: ${{ github.event.number }}
+          issue-number: ${{ steps.get-pr-num.outputs.pr_number }}
           body-includes: '# Highlights'
         
       - name: Create Release doc
