@@ -122,10 +122,10 @@ jobs:
           cd ${{ github.run_id }}
           FULL_VERSION_NUM=${{ inputs.next_version }}
           VERSION=${FULL_VERSION_NUM%%rc*}
-          MAJOR=$(echo "$version" | cut -d. -f1)
-          MINOR=$(echo "$version" | cut -d. -f2)
-          PATCH=$(echo "$version" | cut -d. -f3)
-          PRERELEASE=${FULL_VERSION_NUM#$VERSION}
+          MAJOR=$(echo "$VERSION" | cut -d. -f1)
+          MINOR=$(echo "$VERSION" | cut -d. -f2)
+          PATCH=$(echo "$VERSION" | cut -d. -f3)
+          PRE_RELEASE=${FULL_VERSION_NUM#$VERSION}
           
           sed -i 's/^MAJOR\s*=\s*[0-9]\+/MAJOR = '$MAJOR'/' $VERSION_FILE
           sed -i 's/^MINOR\s*=\s*[0-9]\+/MINOR = '$MINOR'/' $VERSION_FILE
