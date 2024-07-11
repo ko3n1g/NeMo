@@ -51,7 +51,7 @@ jobs:
         id: build-changelog
         uses: mikepenz/release-changelog-builder-action@v3.3.1
         env:
-          GITHUB_TOKEN: ${{ gGITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # Configuration file is setup with filters for domains
           # owner:repo must point to current repo
