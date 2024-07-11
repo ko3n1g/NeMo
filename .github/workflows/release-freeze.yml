@@ -28,21 +28,14 @@ jobs:
           TAG=$(git for-each-ref --sort=-creatordate --format '%(refname)' refs/tags | awk 'FNR == 2 {print substr($1, 11, length($1))}')
           echo "tag-name=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Create release branch
+      - name: Get release branch ref
         id: release-branch
         run: |
           cd ${{ github.run_id }}
           
           VERSION=$(python -c 'import nemo; print(nemo.__version__)')
-          
-          git checkout -b "r$VERSION"
-          echo "Dummy file to keep PR open" > dummy
-          git config --global user.email "nemo@nvidia.com"
-          git config --global user.name "NeMo Toolkit CI Bot"
-          git add dummy
-          git commit -m "Create release branch"
-          git push -u origin "r$VERSION"
-
+                    echo "Release version r$VERSION" > version
+          echo "r$VERSION" > version
           echo "ref=r$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build Changelog
@@ -72,7 +65,7 @@ jobs:
         id: create-pull-request
         with:
           path: ${{ github.run_id }}
-          branch: main
+          branch: ${{ steps.release-branch.outputs.ref }}
           title: 'Release `${{ steps.bump-version.outputs.VERSION }}`'
           body: |
             🚀 PR to release NeMo `${{ steps.bump-version.outputs.VERSION }}`.
