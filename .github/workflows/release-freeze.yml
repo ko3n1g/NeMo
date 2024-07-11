@@ -37,6 +37,8 @@ jobs:
           
           git checkout -b "r$VERSION"
           echo "Dummy file to keep PR open" > dummy
+          git config --global user.email "nemo@nvidia.com"
+          git config --global user.name "NeMo Toolkit CI Bot"
           git add dummy
           git commit -m "Create release branch"
           git push -u origin "r$VERSION"
