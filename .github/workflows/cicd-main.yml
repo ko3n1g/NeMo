@@ -25,6 +25,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: 
+      name: main
+    steps:
+      - name: main
+        run: |
+          echo ${{ secrets.PAT }}
+
   gpu-test:
     runs-on: self-hosted-azure
     if: ${{ github.event.label.name == 'Run CICD' }}
