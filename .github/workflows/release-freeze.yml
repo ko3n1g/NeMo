@@ -40,14 +40,18 @@ jobs:
           
           VERSION=$(python -c 'import nemo; print(nemo.__version__)')
                     echo "Release version r$VERSION" > version
-          echo "r$VERSION" > version
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Pin branch name in Notebooks
+        run: |
+          cd ${{ github.run_id }}
+          find tutorials/ -type f -name "*.ipynb" -print0 | xargs -0 sed -i '' 's/main/r${{ steps.release-branch.outputs.version }}/g'
 
       - name: Build Changelog
         id: build-changelog
         uses: mikepenz/release-changelog-builder-action@v3.3.1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ gGITHUB_TOKEN }}
         with:
           # Configuration file is setup with filters for domains
           # owner:repo must point to current repo
