@@ -45,8 +45,8 @@ jobs:
       - name: Pin branch name in Notebooks
         run: |
           cd ${{ github.run_id }}
-          find tutorials -type f -name "*.ipynb" -exec sed -i '' 's/main/r${{ steps.release-branch.outputs.version }}/g' {} +
-          
+          find tutorials -type f -name "*.ipynb" -exec sed -i 's/main/r${{ steps.release-branch.outputs.version }}/g' {} +
+
       - name: Build Changelog
         id: build-changelog
         uses: mikepenz/release-changelog-builder-action@v3.3.1
