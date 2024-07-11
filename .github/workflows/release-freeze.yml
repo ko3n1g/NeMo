@@ -104,6 +104,8 @@ jobs:
     needs: [create-release-branch]
     environment: 
       name: main
+    env:
+      VERSION_FILE: ${{ github.run_id }}/nemo/package_info.py
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -116,8 +118,6 @@ jobs:
 
       - name: Bump version
         id: bump-version
-        env:
-          VERSION_FILE: ${{ github.run_id }}/nemo/package_info.py
         run: |
           FULL_VERSION_NUM=${{ inputs.next_version }}
           VERSION=${FULL_VERSION_NUM%%rc*}
@@ -133,12 +133,13 @@ jobs:
 
           cat $VERSION_FILE
           PRE_RELEASE=$(echo $PRE_RELEASE | tr -d "'")
-          echo "VERSION=$MAJOR.$MINOR.$PATCH$PRE_RELEASE" >> "$GITHUB_OUTPUT"
+          echo "version=$MAJOR.$MINOR.$PATCH$PRE_RELEASE" >> "$GITHUB_OUTPUT"
 
       - name: Push version bump
         run: |
           cd ${{ github.run_id }}
+          git add $VERSION_FILE
           git config --global user.name "NeMo Toolkit Bot"
           git config --global user.email nemo@github.com
-          git commit -m "Version bump NeMo Toolkit"
+          git commit -m "Version bump NeMo Toolkit to ${{ steps.bump-version.outputs.version }}"
           git push
