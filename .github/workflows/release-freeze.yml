@@ -36,7 +36,7 @@ jobs:
           VERSION=$(python -c 'import nemo; print(nemo.__version__)')
                     echo "Release version r$VERSION" > version
           echo "r$VERSION" > version
-          echo "ref=r$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Build Changelog
         id: build-changelog
@@ -54,7 +54,7 @@ jobs:
           ignorePreReleases: "false"
           failOnError: "false"
           fromTag: ${{ steps.previous-tag.outputs.tag-name }}
-          toTag: ${{ steps.release-branch.outputs.ref }}
+          toTag: r${{ steps.release-branch.outputs.version }}
 
       - name: Append Changelog
         run: |
@@ -65,10 +65,10 @@ jobs:
         id: create-pull-request
         with:
           path: ${{ github.run_id }}
-          branch: ${{ steps.release-branch.outputs.ref }}
-          title: 'Release `${{ steps.bump-version.outputs.VERSION }}`'
+          branch: r${{ steps.release-branch.outputs.version }}
+          title: 'Release `${{ steps.release-branch.outputs.version }}`'
           body: |
-            🚀 PR to release NeMo `${{ steps.bump-version.outputs.VERSION }}`.
+            🚀 PR to release NeMo `${{ steps.release-branch.outputs.version }}`.
 
             📝 Please remember the following to-do's before merge:
             - [ ] Fill-in the comment `Highlights`
@@ -78,7 +78,7 @@ jobs:
 
             🙏 Please merge this PR only if the CI workflow completed successfully.
 
-          commit-message: "[🤠]: Howdy folks, let's release NeMo `${{ steps.bump-version.outputs.VERSION }}` !"
+          commit-message: "[🤠]: Howdy folks, let's release NeMo `${{ steps.release-branch.outputs.version }}` !"
           signoff: true
           assignees: okoenig
           labels: 'Run CICD'
