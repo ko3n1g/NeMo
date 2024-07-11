@@ -110,6 +110,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
           ref: main
+          token: ${{ secrets.PAT }}
 
       - name: Bump version
         id: bump-version
