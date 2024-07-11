@@ -12,8 +12,6 @@ jobs:
       startsWith(github.event.comment.body, '/release-please') &&
       contains(fromJSON('["ko3n1g"]'), github.actor)
     runs-on: ubuntu-latest
-    environment: 
-      name: main
     steps:
       - name: Get PR number
         shell: bash
