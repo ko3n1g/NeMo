@@ -58,7 +58,7 @@ jobs:
         id: create-pull-request
         with:
           path: ${{ github.run_id }}
-          branch: ${{ steps.release-branch.outputs.ref }}
+          branch: main
           title: 'Release `${{ steps.bump-version.outputs.VERSION }}`'
           body: |
             🚀 PR to release NeMo `${{ steps.bump-version.outputs.VERSION }}`.
